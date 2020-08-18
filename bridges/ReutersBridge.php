@@ -133,6 +133,7 @@ class ReutersBridge extends BridgeAbstract
 			if (strpos($data, '.png') !== false
 				|| strpos($data, '.jpg') !== false
 				|| strpos($data, '.PNG') !== false
+				|| strpos($data, '.JPG') !== false
 			) {
 				$description = $description . "<img src=\"$data\">";
 			} else {
