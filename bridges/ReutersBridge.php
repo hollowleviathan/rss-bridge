@@ -47,9 +47,9 @@ class ReutersBridge extends BridgeAbstract
 		),
 	);
 
-	private function getJson($feedname)
+	private function getJson($feed_uri)
 	{
-		$uri = "https://wireapi.reuters.com/v8/feed/rapp/us/tabbar/feeds/$feedname";
+		$uri = "https://wireapi.reuters.com/v8$feed_uri";
 		$returned_data = getContents($uri);
 		return json_decode($returned_data, true);
 	}
@@ -103,9 +103,7 @@ class ReutersBridge extends BridgeAbstract
 	private function getArticle($feed_uri)
 	{
 		// This will make another request to API to get full detail of article and author's name.
-		$uri = "https://wireapi.reuters.com/v8$feed_uri";
-		$data = getContents($uri);
-		$process_data = json_decode($data, true);
+		$process_data = getJson($feed_uri);
 		$reuters_wireitems = $process_data['wireitems'];
 		$processedData = $this->processData($reuters_wireitems);
 
@@ -168,7 +166,8 @@ class ReutersBridge extends BridgeAbstract
 	public function collectData()
 	{
 		$feed = $this->getInput('feed');
-		$data = $this->getJson($feed);
+		$feed_uri = "/feed/rapp/us/tabbar/feeds/$feed";
+		$data = $this->getJson($feed_uri);
 		$reuters_wireitems = $data['wireitems'];
 		$this->feedName = $data['wire_name'] . ' | Reuters';
 		$processedData = $this->processData($reuters_wireitems);
