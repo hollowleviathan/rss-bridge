@@ -103,7 +103,7 @@ class ReutersBridge extends BridgeAbstract
 	private function getArticle($feed_uri)
 	{
 		// This will make another request to API to get full detail of article and author's name.
-		$process_data = getJson($feed_uri);
+		$process_data = $this->getJson($feed_uri);
 		$reuters_wireitems = $process_data['wireitems'];
 		$processedData = $this->processData($reuters_wireitems);
 
