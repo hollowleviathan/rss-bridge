@@ -156,7 +156,6 @@ class ReutersBridge extends BridgeAbstract
 					$description = $description . "<p>$data</p>";
 				}
 			}
-			
 		}
 
 		$content_detail = array(
