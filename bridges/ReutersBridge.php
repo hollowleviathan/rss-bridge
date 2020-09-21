@@ -139,21 +139,24 @@ class ReutersBridge extends BridgeAbstract
 				}
 				$description = $description . '</p>';
 			} else {
-				$data = $content['content'];
-				if (strtoupper($data) == $data
-					|| $content['type'] == 'heading'
-				) {
-					//Add heading for any part of content served as header.
-					$description = $description . "<h3>$data</h3>";
-				} else {
-					if (strpos($data, '.png') !== false
-					|| strpos($data, '.jpg') !== false
-					|| strpos($data, '.PNG') !== false
-					|| strpos($data, '.JPG') !== false
+				if(isset($content['content'])) {
+					$data = $content['content'];
+					if (strtoupper($data) == $data
+						|| $content['type'] == 'heading'
 					) {
-						$description = $description . "<img src=\"$data\">";
+						//Add heading for any part of content served as header.
+						$description = $description . "<h3>$data</h3>";
+					} else {
+						if (strpos($data, '.png') !== false
+						|| strpos($data, '.jpg') !== false
+						|| strpos($data, '.PNG') !== false
+						|| strpos($data, '.JPG') !== false
+						) {
+							$description = $description . "<img src=\"$data\">";
+						} else {
+							$description = $description . "<p>$data</p>";
+						}
 					}
-					$description = $description . "<p>$data</p>";
 				}
 			}
 		}
@@ -192,7 +195,7 @@ class ReutersBridge extends BridgeAbstract
 				$description = $story['story']['lede']; // Just in case the content doesn't have anything.
 			}
 
-			if ($story['template'] == 'story_basic') {
+			if (!isset($story['image']['url'])) {
 				$item['content'] = $description;
 			} else {
 				$image_url = $story['image']['url'];
