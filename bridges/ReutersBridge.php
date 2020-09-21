@@ -191,7 +191,7 @@ class ReutersBridge extends BridgeAbstract
 			if (!(bool) $description) {
 				$description = $story['story']['lede']; // Just in case the content doesn't have anything.
 			}
-      
+			
 			if ($story['template'] == 'story_basic') {
 				$item['content'] = $description;
 			} else {
