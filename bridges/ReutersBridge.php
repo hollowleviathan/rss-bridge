@@ -4,7 +4,7 @@ class ReutersBridge extends BridgeAbstract
 	const MAINTAINER = 'hollowleviathan, spraynard, csisoap';
 	const NAME = 'Reuters Bridge';
 	const URI = 'https://reuters.com/';
-	const CACHE_TIMEOUT = 1800; // 30min
+	const CACHE_TIMEOUT = 120; // 30min
 	const DESCRIPTION = 'Returns news from Reuters';
 	private $feedName = self::NAME;
 
@@ -126,34 +126,37 @@ class ReutersBridge extends BridgeAbstract
 
 		$description = '';
 		foreach ($article_content as $content) {
-			$data = $content['content'];
-			// This will check whether that content is a image URL or not.
-			if (strpos($data, '.png') !== false
-				|| strpos($data, '.jpg') !== false
-				|| strpos($data, '.PNG') !== false
-				|| strpos($data, '.JPG') !== false
-			) {
-				$description = $description . "<img src=\"$data\">";
-			} else {
-				if ($content['type'] == 'inline_items') {
-					//Fix issue with some content included brand name or company name.
-					$item_list = $content['items'];
-					$description = $description . '<p>';
-					foreach ($item_list as $item) {
+			if ($content['type'] == 'inline_items') {
+				//Fix issue with some content included brand name or company name.
+				$item_list = $content['items'];
+				$description = $description . '<p>';
+				foreach ($item_list as $item) {
+					if($item['type'] == 'text') {
 						$description = $description . $item['content'];
-					}
-					$description = $description . '</p>';
-				} else {
-					if (strtoupper($data) == $data
-						|| $content['type'] == 'heading'
-					) {
-						//Add heading for any part of content served as header.
-						$description = $description . "<h3>$data</h3>";
 					} else {
-						$description = $description . "<p>$data</p>";
+						$description = $description . $item['symbol'];
 					}
 				}
+				$description = $description . '</p>';
+			} else {
+				$data = $content['content'];
+				if (strtoupper($data) == $data
+					|| $content['type'] == 'heading'
+				) {
+					//Add heading for any part of content served as header.
+					$description = $description . "<h3>$data</h3>";
+				} else {
+					if (strpos($data, '.png') !== false
+					|| strpos($data, '.jpg') !== false
+					|| strpos($data, '.PNG') !== false
+					|| strpos($data, '.JPG') !== false
+					) {
+						$description = $description . "<img src=\"$data\">";
+					}
+					$description = $description . "<p>$data</p>";
+				}
 			}
+			
 		}
 
 		$content_detail = array(
@@ -189,13 +192,11 @@ class ReutersBridge extends BridgeAbstract
 			if (!(bool) $description) {
 				$description = $story['story']['lede']; // Just in case the content doesn't have anything.
 			}
-			// $description = $story['story']['lede'];
-			$image_url = $story['image']['url'];
-			if (!(bool) $image_url) {
-				// $image_url =
-				// 'https://s4.reutersmedia.net/resources_v2/images/rcom-default.png'; //Just in case if there aren't any pictures.
+			
+			if ($story['template'] == 'story_basic') {
 				$item['content'] = $description;
 			} else {
+				$image_url = $story['image']['url'];
 				$item['content'] = "<img src=\"$image_url\"> \n
 					$description";
 			}
