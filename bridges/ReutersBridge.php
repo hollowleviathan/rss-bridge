@@ -110,6 +110,18 @@ class ReutersBridge extends BridgeAbstract
 		$first = reset($processedData);
 		$article_content = $first['story']['body_items'];
 		$authorlist = $first['story']['authors'];
+		$category = $first['story']['channel']['name'];
+		$image_list = $first['story']['images'];
+		$img_placeholder = '';
+
+		foreach($image_list as $image) { // Add more image to article.
+			$image_url = $image['url'];
+			$image_caption = $image['caption'];
+			$img = "<img src=\"$image_url\">";
+			$img_caption = "<figcaption style=\"text-align: center;\"><i>$image_caption</i></figcaption>";
+			$figure = "<figure>$img \t $img_caption</figure>";
+			$img_placeholder = $img_placeholder . $figure;
+		}
 
 		$author = '';
 		$counter = 0;
@@ -164,6 +176,8 @@ class ReutersBridge extends BridgeAbstract
 		$content_detail = array(
 			'content' => $description,
 			'author' => $author,
+			'category' => $category,
+			'images' => $img_placeholder,
 		);
 		return $content_detail;
 	}
@@ -190,18 +204,15 @@ class ReutersBridge extends BridgeAbstract
 			$content_detail = $this->getArticle($article_uri);
 			$description = $content_detail['content'];
 			$author = $content_detail['author'];
+			$images = $content_detail['images'];
+			$item['categories'] = [ $content_detail['category'] ];
 			$item['author'] = $author;
 			if (!(bool) $description) {
 				$description = $story['story']['lede']; // Just in case the content doesn't have anything.
+			} else {
+				$item['content'] = "$description  $images";
 			}
 
-			if (!isset($story['image']['url'])) {
-				$item['content'] = $description;
-			} else {
-				$image_url = $story['image']['url'];
-				$item['content'] = "<img src=\"$image_url\"> \n
-					$description";
-			}
 			$item['title'] = $story['story']['hed'];
 			$item['timestamp'] = $story['story']['updated_at'];
 			$item['uri'] = $story['template_action']['url'];
