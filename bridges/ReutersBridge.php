@@ -205,7 +205,7 @@ class ReutersBridge extends BridgeAbstract
 			$description = $content_detail['content'];
 			$author = $content_detail['author'];
 			$images = $content_detail['images'];
-			$item['categories'] = [ $content_detail['category'] ];
+			$item['categories'] = array($content_detail['category']);
 			$item['author'] = $author;
 			if (!(bool) $description) {
 				$description = $story['story']['lede']; // Just in case the content doesn't have anything.
