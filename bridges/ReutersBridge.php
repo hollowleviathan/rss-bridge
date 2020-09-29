@@ -40,7 +40,6 @@ class ReutersBridge extends BridgeAbstract
 					'Top News' => 'home/topnews',
 					'Markets' => 'markets',
 					'Sports' => 'sports',
-					'Pic of the Day' => 'pictures', // This has a different configuration than the others.
 					'USA News' => 'us',
 				),
 			),
