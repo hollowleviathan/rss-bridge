@@ -4,7 +4,7 @@ class ReutersBridge extends BridgeAbstract
 	const MAINTAINER = 'hollowleviathan, spraynard, csisoap';
 	const NAME = 'Reuters Bridge';
 	const URI = 'https://reuters.com/';
-	const CACHE_TIMEOUT = 120; // 30min
+	const CACHE_TIMEOUT = 1800; // 30min
 	const DESCRIPTION = 'Returns news from Reuters';
 	private $feedName = self::NAME;
 
@@ -40,7 +40,6 @@ class ReutersBridge extends BridgeAbstract
 					'Top News' => 'home/topnews',
 					'Markets' => 'markets',
 					'Sports' => 'sports',
-					'Pic of the Day' => 'pictures', // This has a different configuration than the others.
 					'USA News' => 'us',
 				),
 			),
