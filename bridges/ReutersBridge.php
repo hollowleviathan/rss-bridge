@@ -18,8 +18,8 @@ class ReutersBridge extends BridgeAbstract
 	);
 
 	const PARAMETERS = array(
-	array(
-	'feed' => array(
+		array(
+			'feed' => array(
 				'name' => 'News Feed',
 				'type' => 'list',
 				'exampleValue' => 'World',
@@ -35,20 +35,20 @@ class ReutersBridge extends BridgeAbstract
 					'Lifestyle' => 'life',
 					'Energy' => 'energy',
 					'Aerospace and Defence' => 'aerospace',
+					'Special Reports' => 'special-reports',
 					'China' => 'china',
 					'Top News' => 'home/topnews',
 					'Markets' => 'markets',
 					'Sports' => 'sports',
-					'Pic of the Day' => 'pictures', // This has a different configuration than the others.
 					'USA News' => 'us',
 				),
-	),
-	),
+			),
+		),
 	);
 
-	private function getJson($feedname)
+	private function getJson($feed_uri)
 	{
-		$uri = "https://wireapi.reuters.com/v8/feed/rapp/us/tabbar/feeds/$feedname";
+		$uri = "https://wireapi.reuters.com/v8$feed_uri";
 		$returned_data = getContents($uri);
 		return json_decode($returned_data, true);
 	}
@@ -102,15 +102,25 @@ class ReutersBridge extends BridgeAbstract
 	private function getArticle($feed_uri)
 	{
 		// This will make another request to API to get full detail of article and author's name.
-		$uri = "https://wireapi.reuters.com/v8$feed_uri";
-		$data = getContents($uri);
-		$process_data = json_decode($data, true);
+		$process_data = $this->getJson($feed_uri);
 		$reuters_wireitems = $process_data['wireitems'];
 		$processedData = $this->processData($reuters_wireitems);
 
 		$first = reset($processedData);
 		$article_content = $first['story']['body_items'];
 		$authorlist = $first['story']['authors'];
+		$category = $first['story']['channel']['name'];
+		$image_list = $first['story']['images'];
+		$img_placeholder = '';
+
+		foreach($image_list as $image) { // Add more image to article.
+			$image_url = $image['url'];
+			$image_caption = $image['caption'];
+			$img = "<img src=\"$image_url\">";
+			$img_caption = "<figcaption style=\"text-align: center;\"><i>$image_caption</i></figcaption>";
+			$figure = "<figure>$img \t $img_caption</figure>";
+			$img_placeholder = $img_placeholder . $figure;
+		}
 
 		$author = '';
 		$counter = 0;
@@ -127,30 +137,36 @@ class ReutersBridge extends BridgeAbstract
 
 		$description = '';
 		foreach ($article_content as $content) {
-			$data = $content['content'];
-			// This will check whether that content is a image URL or not.
-			if (strpos($data, '.png') !== false
-				|| strpos($data, '.jpg') !== false
-				|| strpos($data, '.PNG') !== false
-			) {
-				$description = $description . "<img src=\"$data\">";
-			} else {
-				if ($content['type'] == 'inline_items') {
-					//Fix issue with some content included brand name or company name.
-					$item_list = $content['items'];
-					$description = $description . '<p>';
-					foreach ($item_list as $item) {
+			if ($content['type'] == 'inline_items') {
+				//Fix issue with some content included brand name or company name.
+				$item_list = $content['items'];
+				$description = $description . '<p>';
+				foreach ($item_list as $item) {
+					if($item['type'] == 'text') {
 						$description = $description . $item['content'];
+					} else {
+						$description = $description . $item['symbol'];
 					}
-					$description = $description . '</p>';
-				} else {
+				}
+				$description = $description . '</p>';
+			} else {
+				if(isset($content['content'])) {
+					$data = $content['content'];
 					if (strtoupper($data) == $data
 						|| $content['type'] == 'heading'
 					) {
 						//Add heading for any part of content served as header.
 						$description = $description . "<h3>$data</h3>";
 					} else {
-						$description = $description . "<p>$data</p>";
+						if (strpos($data, '.png') !== false
+						|| strpos($data, '.jpg') !== false
+						|| strpos($data, '.PNG') !== false
+						|| strpos($data, '.JPG') !== false
+						) {
+							$description = $description . "<img src=\"$data\">";
+						} else {
+							$description = $description . "<p>$data</p>";
+						}
 					}
 				}
 			}
@@ -159,6 +175,8 @@ class ReutersBridge extends BridgeAbstract
 		$content_detail = array(
 			'content' => $description,
 			'author' => $author,
+			'category' => $category,
+			'images' => $img_placeholder,
 		);
 		return $content_detail;
 	}
@@ -166,7 +184,8 @@ class ReutersBridge extends BridgeAbstract
 	public function collectData()
 	{
 		$feed = $this->getInput('feed');
-		$data = $this->getJson($feed);
+		$feed_uri = "/feed/rapp/us/tabbar/feeds/$feed";
+		$data = $this->getJson($feed_uri);
 		$reuters_wireitems = $data['wireitems'];
 		$this->feedName = $data['wire_name'] . ' | Reuters';
 		$processedData = $this->processData($reuters_wireitems);
@@ -184,20 +203,15 @@ class ReutersBridge extends BridgeAbstract
 			$content_detail = $this->getArticle($article_uri);
 			$description = $content_detail['content'];
 			$author = $content_detail['author'];
+			$images = $content_detail['images'];
+			$item['categories'] = array($content_detail['category']);
 			$item['author'] = $author;
 			if (!(bool) $description) {
 				$description = $story['story']['lede']; // Just in case the content doesn't have anything.
-			}
-			// $description = $story['story']['lede'];
-			$image_url = $story['image']['url'];
-			if (!(bool) $image_url) {
-				// $image_url =
-				// 'https://s4.reutersmedia.net/resources_v2/images/rcom-default.png'; //Just in case if there aren't any pictures.
-				$item['content'] = $description;
 			} else {
-				$item['content'] = "<img src=\"$image_url\"> \n
-					$description";
+				$item['content'] = "$description  $images";
 			}
+
 			$item['title'] = $story['story']['hed'];
 			$item['timestamp'] = $story['story']['updated_at'];
 			$item['uri'] = $story['template_action']['url'];
