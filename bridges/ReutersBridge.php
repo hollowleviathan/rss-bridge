@@ -137,38 +137,35 @@ class ReutersBridge extends BridgeAbstract
 
 		$description = '';
 		foreach ($article_content as $content) {
-			if ($content['type'] == 'inline_items') {
-				//Fix issue with some content included brand name or company name.
-				$item_list = $content['items'];
-				$description = $description . '<p>';
-				foreach ($item_list as $item) {
-					if($item['type'] == 'text') {
-						$description = $description . $item['content'];
-					} else {
-						$description = $description . $item['symbol'];
-					}
-				}
-				$description = $description . '</p>';
-			} else {
-				if(isset($content['content'])) {
-					$data = $content['content'];
-					if (strtoupper($data) == $data
-						|| $content['type'] == 'heading'
-					) {
-						//Add heading for any part of content served as header.
-						$description = $description . "<h3>$data</h3>";
-					} else {
-						if (strpos($data, '.png') !== false
-						|| strpos($data, '.jpg') !== false
-						|| strpos($data, '.PNG') !== false
-						|| strpos($data, '.JPG') !== false
-						) {
-							$description = $description . "<img src=\"$data\">";
+			$data;
+			if(isset($content['content'])) {
+				$data = $content['content'];
+			}
+			switch($content['type']) {
+				case 'paragraph':
+					$description = $description . "<p>$data</p>";
+					break;
+				case 'heading':
+					$description = $description . "<h3>$data</h3>";
+					break;
+				case 'infographics':
+					$description = $description . "<img src=\"$data\">";
+					break;
+				case 'inline_items':
+					$item_list = $content['items'];
+					$description = $description . '<p>';
+					foreach ($item_list as $item) {
+						if($item['type'] == 'text') {
+							$description = $description . $item['content'];
 						} else {
-							$description = $description . "<p>$data</p>";
+							$description = $description . $item['symbol'];
 						}
 					}
-				}
+					$description = $description . '</p>';
+					break;
+				case 'p_table':
+					$description = $description . $content['content'];
+					break;
 			}
 		}
 
