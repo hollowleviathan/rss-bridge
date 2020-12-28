@@ -6,20 +6,42 @@ class ReutersBridge extends BridgeAbstract
 	const URI = 'https://reuters.com/';
 	const CACHE_TIMEOUT = 1800; // 30min
 	const DESCRIPTION = 'Returns news from Reuters';
+
 	private $feedName = self::NAME;
 
+	/**
+	 * Wireitem types allowed in the final story output
+	 */
 	const ALLOWED_WIREITEM_TYPES = array(
 		'story',
 		'headlines'
 	);
 
+	/**
+	 * Wireitem template types allowed in the final story output
+	 */
 	const ALLOWED_TEMPLATE_TYPES = array(
 		'story'
 	);
 
+	const FEED_REGION_LABEL_US = 'United States';
+	const FEED_REGION_LABEL_UK = 'United Kingdom';
+
+	const FEED_REGION_VALUE_US = 'us';
+	const FEED_REGION_VALUE_UK = 'uk';
+
 	const PARAMETERS = array(
 		array(
-			'feed' => array(
+			'feed_region' => array(
+				'name' => 'Region',
+				'type' => 'list',
+				'title' => 'Region Selection',
+				'values' => array(
+					self::FEED_REGION_LABEL_US => self::FEED_REGION_VALUE_US,
+					self::FEED_REGION_LABEL_UK => self::FEED_REGION_VALUE_UK
+				)
+			),
+			'feed_name' => array(
 				'name' => 'News Feed',
 				'type' => 'list',
 				'exampleValue' => 'World',
@@ -46,6 +68,12 @@ class ReutersBridge extends BridgeAbstract
 		),
 	);
 
+	/**
+	 * Performs an HTTP request to the Reuters API and returns decoded JSON
+	 * in the form of an associative array
+	 * @param string $feed_uri Parameter string to the Reuters API
+	 * @return array
+	 */
 	private function getJson($feed_uri)
 	{
 		$uri = "https://wireapi.reuters.com/v8$feed_uri";
@@ -58,6 +86,12 @@ class ReutersBridge extends BridgeAbstract
 		return $this->feedName;
 	}
 
+	/**
+	 * Takes in data from Reuters Wire API and
+	 * creates structured data in the form of a list
+	 * of story information.
+	 * @param array $data JSON collected from the Reuters Wire API
+	 */
 	private function processData($data)
 	{
 		/**
@@ -183,8 +217,9 @@ class ReutersBridge extends BridgeAbstract
 
 	public function collectData()
 	{
-		$feed = $this->getInput('feed');
-		$feed_uri = "/feed/rapp/us/tabbar/feeds/$feed";
+		$feed_name = $this->getInput('feed_name');
+		$feed_region = $this->getInput('feed_region');
+		$feed_uri = "/feed/rapp/$feed_region/tabbar/feeds/$feed_name";
 		$data = $this->getJson($feed_uri);
 		$reuters_wireitems = $data['wireitems'];
 		$this->feedName = $data['wire_name'] . ' | Reuters';
