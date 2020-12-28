@@ -35,7 +35,7 @@ class ReutersBridge extends BridgeAbstract
 			'feed_region' => array(
 				'name' => 'Region',
 				'type' => 'list',
-				'title' => 'Region Selection',
+				'title' => 'Source articles from the available regions',
 				'values' => array(
 					self::FEED_REGION_LABEL_US => self::FEED_REGION_VALUE_US,
 					self::FEED_REGION_LABEL_UK => self::FEED_REGION_VALUE_UK
