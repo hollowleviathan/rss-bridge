@@ -66,7 +66,7 @@ class ReutersBridge extends BridgeAbstract
 					'World' => 'world',
 					'Politics' => 'politics',
 					'Science' => 'science',
-					'Lifestyle' => 'lifestyle',
+					'Lifestyle' => 'life',
 					'Energy' => 'energy',
 					'Aerospace and Defense' => 'aerospace',
 					'Special Reports' => 'special-reports',
