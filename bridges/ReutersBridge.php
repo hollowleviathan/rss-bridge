@@ -24,15 +24,37 @@ class ReutersBridge extends BridgeAbstract
 		'story'
 	);
 
-	const FEED_REGION_LABEL_US = 'United States/International';
-	const FEED_REGION_LABEL_UK = 'United Kingdom';
-
 	const FEED_REGION_VALUE_US = 'us';
 	const FEED_REGION_VALUE_UK = 'uk';
 
 	const PARAMETERS = array(
-		self::FEED_REGION_LABEL_US => array(
-			'feed_name' => array(
+		'United Kingdom' => array(
+			'feed_uk' => array(
+				'name' => 'News Feed',
+				'type' => 'list',
+				'exampleValue' => 'World',
+				'title' => 'Feeds from Reuters U.K edition',
+				'values' => array(
+					'Tech' => 'tech',
+					'Wire' => 'wire',
+					'Business' => 'business',
+					'World' => 'world',
+					'Politics' => 'politics',
+					'Science' => 'science',
+					'Energy' => 'energy',
+					'Aerospace and Defense' => 'aerospace',
+					'Special Reports' => 'special-reports',
+					'Top News' => 'home/topnews',
+					'Markets' => 'markets',
+					'Sports' => 'sports',
+          'UK' => 'uk',
+					'Entertainment' => 'entertainment',
+					'Environment' => 'environment'
+				)
+			)
+		),
+		'United States' => array(
+			'feed_us' => array(
 				'name' => 'News Feed',
 				'type' => 'list',
 				'title' => 'Feeds from Reuters U.S/International edition',
@@ -44,43 +66,18 @@ class ReutersBridge extends BridgeAbstract
 					'World' => 'world',
 					'Politics' => 'politics',
 					'Science' => 'science',
-					'Lifestyle' => 'life',
+					'Lifestyle' => 'lifestyle',
 					'Energy' => 'energy',
-					'Aerospace and Defence' => 'aerospace',
+					'Aerospace and Defense' => 'aerospace',
 					'Special Reports' => 'special-reports',
 					'China' => 'china',
 					'Top News' => 'home/topnews',
 					'Markets' => 'markets',
 					'Sports' => 'sports',
 					'USA News' => 'us',
-				),
-			),
-		),
-		self::FEED_REGION_LABEL_UK => array(
-			'feed_name' => array(
-				'name' => 'News Feed',
-				'type' => 'list',
-				'title' => 'Feeds from Reuters U.K edition',
-				'values' => array(
-					'Tech' => 'tech',
-					'Wire' => 'wire',
-					'Business' => 'business',
-					'World' => 'world',
-					'Politics' => 'politics',
-					'Science' => 'science',
-					'Lifestyle' => 'lifestyle',
-					'Energy' => 'energy',
-					'Aerospace and Defence' => 'aerospace',
-					'Special Reports' => 'special-reports',
-					'Top News' => 'home/topnews',
-					'Markets' => 'markets',
-					'Sports' => 'sports',
-					'UK' => 'uk',
-					'Entertainment' => 'entertainment',
-					'Environment' => 'environment'
-				),
-			),
-		),
+				)
+			)
+		)
 	);
 
 	/**
@@ -94,11 +91,6 @@ class ReutersBridge extends BridgeAbstract
 		$uri = "https://wireapi.reuters.com/v8$feed_uri";
 		$returned_data = getContents($uri);
 		return json_decode($returned_data, true);
-	}
-
-	public function getName()
-	{
-		return $this->feedName;
 	}
 
 	/**
@@ -229,18 +221,22 @@ class ReutersBridge extends BridgeAbstract
 
 	public function collectData()
 	{
-		switch($this->queriedContext) {
-			case self::FEED_REGION_LABEL_UK:
-				$feed_name = $this->getInput('feed_name');
-				$feed_region = self::FEED_REGION_VALUE_UK;
+		$reuters_feed_name = null;
+		$reuters_feed_region = null;
+
+		switch ($this->queriedContext) {
+			case 'United Kingdom':
+				$reuters_feed_name = $this->getInput('feed_uk');
+				$reuters_feed_region = self::FEED_REGION_VALUE_UK;
 				break;
-			case self::FEED_REGION_LABEL_US:
-				$feed_name = $this->getInput('feed_name');
-				$feed_region = self::FEED_REGION_VALUE_US;
+			case 'United States':
+				$reuters_feed_name = $this->getInput('feed_us');
+				$reuters_feed_region = self::FEED_REGION_VALUE_US;
 				break;
 		}
 
-		$feed_uri = "/feed/rapp/$feed_region/tabbar/feeds/$feed_name";
+		$feed_uri = "/feed/rapp/$reuters_feed_region/tabbar/feeds/$reuters_feed_name";
+
 		$data = $this->getJson($feed_uri);
 		$reuters_wireitems = $data['wireitems'];
 		$this->feedName = $data['wire_name'] . ' | Reuters';
