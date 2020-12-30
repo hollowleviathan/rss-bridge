@@ -48,7 +48,8 @@ class ReutersBridge extends BridgeAbstract
 					'Sports' => 'sports',
           				'UK' => 'uk',
 					'Entertainment' => 'entertainment',
-					'Environment' => 'environment'
+					'Environment' => 'environment',
+					'Lifestyle' => 'lifestyle'
 				)
 			)
 		),
