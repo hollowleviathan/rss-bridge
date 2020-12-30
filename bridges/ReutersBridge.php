@@ -41,9 +41,8 @@ class ReutersBridge extends BridgeAbstract
 					'World' => 'world',
 					'Politics' => 'politics',
 					'Science' => 'science',
-					'Lifestyle' => 'life',
 					'Energy' => 'energy',
-					'Aerospace and Defence' => 'aerospace',
+					'Aerospace and Defense' => 'aerospace',
 					'Special Reports' => 'special-reports',
 					'Top News' => 'home/topnews',
 					'Markets' => 'markets',
@@ -67,7 +66,7 @@ class ReutersBridge extends BridgeAbstract
 					'Science' => 'science',
 					'Lifestyle' => 'life',
 					'Energy' => 'energy',
-					'Aerospace and Defence' => 'aerospace',
+					'Aerospace and Defense' => 'aerospace',
 					'Special Reports' => 'special-reports',
 					'China' => 'china',
 					'Top News' => 'home/topnews',
@@ -90,32 +89,6 @@ class ReutersBridge extends BridgeAbstract
 		$uri = "https://wireapi.reuters.com/v8$feed_uri";
 		$returned_data = getContents($uri);
 		return json_decode($returned_data, true);
-	}
-
-	/**
-	 * Obtains domain specific user input by context
-	 * @return array
-	 */
-	private function getUserInput()
-	{
-		$reuters_feed_name = null;
-		$reuters_feed_region = null;
-
-		switch ($this->queriedContext) {
-			case 'United Kingdom':
-				$reuters_feed_name = $this->getInput('feed_uk');
-				$reuters_feed_region = self::FEED_REGION_VALUE_UK;
-				break;
-			case 'United States':
-				$reuters_feed_name = $this->getInput('feed_us');
-				$reuters_feed_region = self::FEED_REGION_VALUE_US;
-				break;
-		}
-
-		return [
-			'feed_name' => $reuters_feed_name,
-			'feed_region' => $reuters_feed_region
-		];
 	}
 
 	/**
@@ -249,11 +222,21 @@ class ReutersBridge extends BridgeAbstract
 
 	public function collectData()
 	{
-		$userInput = $this->getUserInput();
-		$feed_name = $userInput['feed_name'];
-		$feed_region = $userInput['feed_region'];
+		$reuters_feed_name = null;
+		$reuters_feed_region = null;
 
-		$feed_uri = "/feed/rapp/$feed_region/tabbar/feeds/$feed_name";
+		switch ($this->queriedContext) {
+			case 'United Kingdom':
+				$reuters_feed_name = $this->getInput('feed_uk');
+				$reuters_feed_region = self::FEED_REGION_VALUE_UK;
+				break;
+			case 'United States':
+				$reuters_feed_name = $this->getInput('feed_us');
+				$reuters_feed_region = self::FEED_REGION_VALUE_US;
+				break;
+		}
+
+		$feed_uri = "/feed/rapp/$reuters_feed_region/tabbar/feeds/$reuters_feed_name";
 
 		$data = $this->getJson($feed_uri);
 		$reuters_wireitems = $data['wireitems'];
