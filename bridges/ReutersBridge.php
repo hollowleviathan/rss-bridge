@@ -32,7 +32,6 @@ class ReutersBridge extends BridgeAbstract
 			'feed_uk' => array(
 				'name' => 'News Feed',
 				'type' => 'list',
-				'exampleValue' => 'World',
 				'title' => 'Feeds from Reuters U.K edition',
 				'values' => array(
 					'Tech' => 'tech',
@@ -47,7 +46,7 @@ class ReutersBridge extends BridgeAbstract
 					'Top News' => 'home/topnews',
 					'Markets' => 'markets',
 					'Sports' => 'sports',
-          'UK' => 'uk',
+          				'UK' => 'uk',
 					'Entertainment' => 'entertainment',
 					'Environment' => 'environment'
 				)
