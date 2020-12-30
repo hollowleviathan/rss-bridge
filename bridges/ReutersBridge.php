@@ -96,7 +96,7 @@ class ReutersBridge extends BridgeAbstract
 	 * Obtains domain specific user input by context
 	 * @return array
 	 */
-	public function getUserInput()
+	private function getUserInput()
 	{
 		$reuters_feed_name = null;
 		$reuters_feed_region = null;
