@@ -24,24 +24,35 @@ class ReutersBridge extends BridgeAbstract
 		'story'
 	);
 
-	const FEED_REGION_LABEL_US = 'United States';
-	const FEED_REGION_LABEL_UK = 'United Kingdom';
-
 	const FEED_REGION_VALUE_US = 'us';
 	const FEED_REGION_VALUE_UK = 'uk';
 
 	const PARAMETERS = array(
-		array(
-			'feed_region' => array(
-				'name' => 'Region',
+		'United Kingdom' => array(
+			'feed_uk' => array(
+				'name' => 'News Feed',
 				'type' => 'list',
-				'title' => 'Source articles from the available regions',
+				'exampleValue' => 'World',
+				'title' => 'Reuters feed. World, US, Tech...',
 				'values' => array(
-					self::FEED_REGION_LABEL_US => self::FEED_REGION_VALUE_US,
-					self::FEED_REGION_LABEL_UK => self::FEED_REGION_VALUE_UK
+					'Tech' => 'tech',
+					'Wire' => 'wire',
+					'Business' => 'business',
+					'World' => 'world',
+					'Politics' => 'politics',
+					'Science' => 'science',
+					'Lifestyle' => 'life',
+					'Energy' => 'energy',
+					'Aerospace and Defence' => 'aerospace',
+					'Special Reports' => 'special-reports',
+					'Top News' => 'home/topnews',
+					'Markets' => 'markets',
+					'Sports' => 'sports',
 				)
-			),
-			'feed_name' => array(
+			)
+		),
+		'United States' => array(
+			'feed_us' => array(
 				'name' => 'News Feed',
 				'type' => 'list',
 				'exampleValue' => 'World',
@@ -63,9 +74,9 @@ class ReutersBridge extends BridgeAbstract
 					'Markets' => 'markets',
 					'Sports' => 'sports',
 					'USA News' => 'us',
-				),
-			),
-		),
+				)
+			)
+		)
 	);
 
 	/**
@@ -81,9 +92,30 @@ class ReutersBridge extends BridgeAbstract
 		return json_decode($returned_data, true);
 	}
 
-	public function getName()
+	/**
+	 * Obtains domain specific user input by context
+	 * @return array
+	 */
+	public function getUserInput()
 	{
-		return $this->feedName;
+		$reuters_feed_name = null;
+		$reuters_feed_region = null;
+
+		switch ($this->queriedContext) {
+			case 'United Kingdom':
+				$reuters_feed_name = $this->getInput('feed_uk');
+				$reuters_feed_region = self::FEED_REGION_VALUE_UK;
+				break;
+			case 'United States':
+				$reuters_feed_name = $this->getInput('feed_us');
+				$reuters_feed_region = self::FEED_REGION_VALUE_US;
+				break;
+		}
+
+		return [
+			'feed_name' => $reuters_feed_name,
+			'feed_region' => $reuters_feed_region
+		];
 	}
 
 	/**
@@ -217,9 +249,12 @@ class ReutersBridge extends BridgeAbstract
 
 	public function collectData()
 	{
-		$feed_name = $this->getInput('feed_name');
-		$feed_region = $this->getInput('feed_region');
+		$userInput = $this->getUserInput();
+		$feed_name = $userInput['feed_name'];
+		$feed_region = $userInput['feed_region'];
+
 		$feed_uri = "/feed/rapp/$feed_region/tabbar/feeds/$feed_name";
+
 		$data = $this->getJson($feed_uri);
 		$reuters_wireitems = $data['wireitems'];
 		$this->feedName = $data['wire_name'] . ' | Reuters';
