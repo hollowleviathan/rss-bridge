@@ -46,7 +46,7 @@ class ReutersBridge extends BridgeAbstract
 					'Top News' => 'home/topnews',
 					'Markets' => 'markets',
 					'Sports' => 'sports'
-          'UK' => 'uk',
+          				'UK' => 'uk',
 					'Entertainment' => 'entertainment',
 					'Environment' => 'environment',
 					'Lifestyle' => 'lifestyle'
