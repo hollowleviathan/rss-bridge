@@ -46,7 +46,7 @@ class ReutersBridge extends BridgeAbstract
 					'Top News' => 'home/topnews',
 					'Markets' => 'markets',
 					'Sports' => 'sports',
-          				'UK' => 'uk',
+					'UK' => 'uk',
 					'Entertainment' => 'entertainment',
 					'Environment' => 'environment',
 					'Lifestyle' => 'lifestyle',
@@ -217,6 +217,10 @@ class ReutersBridge extends BridgeAbstract
 			'images' => $img_placeholder,
 		);
 		return $content_detail;
+	}
+
+	public function getName() {
+		return $this->feedName;
 	}
 
 	public function collectData()
