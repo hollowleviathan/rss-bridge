@@ -45,11 +45,11 @@ class ReutersBridge extends BridgeAbstract
 					'Special Reports' => 'special-reports',
 					'Top News' => 'home/topnews',
 					'Markets' => 'markets',
-					'Sports' => 'sports'
+					'Sports' => 'sports',
           				'UK' => 'uk',
 					'Entertainment' => 'entertainment',
 					'Environment' => 'environment',
-					'Lifestyle' => 'lifestyle'
+					'Lifestyle' => 'lifestyle',
 				)
 			)
 		),
