@@ -45,8 +45,8 @@ class ReutersBridge extends BridgeAbstract
 					'Special Reports' => 'special-reports',
 					'Top News' => 'home/topnews',
 					'Markets' => 'markets',
-					'Sports' => 'sports',
-          				'UK' => 'uk',
+					'Sports' => 'sports'
+          'UK' => 'uk',
 					'Entertainment' => 'entertainment',
 					'Environment' => 'environment',
 					'Lifestyle' => 'lifestyle'
@@ -143,8 +143,8 @@ class ReutersBridge extends BridgeAbstract
 	private function getArticle($feed_uri)
 	{
 		// This will make another request to API to get full detail of article and author's name.
-		$process_data = $this->getJson($feed_uri);
-		$reuters_wireitems = $process_data['wireitems'];
+		$rawData = $this->getJson($feed_uri);
+		$reuters_wireitems = $rawData['wireitems'];
 		$processedData = $this->processData($reuters_wireitems);
 
 		$first = reset($processedData);
